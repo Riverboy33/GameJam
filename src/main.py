@@ -1,11 +1,15 @@
+from dataclasses import dataclass
+
 import json
 import math
 import os
 import time
-from dataclasses import dataclass
 
 import pygame
-
+from Class.CookieButton import CookieButton
+from Class.UiButton import UiButton
+from calc import calc_cps, click_upgrade_cost, building_cost
+from save import save_state, reset_save
 
 SAVE_PATH = os.path.join(os.path.dirname(__file__), "save.json")
 
@@ -16,11 +20,13 @@ FPS = 60
 BG = (18, 18, 22)
 PANEL = (28, 28, 34)
 PANEL_2 = (35, 35, 44)
-TEXT = (235, 235, 240)
-MUTED = (170, 170, 180)
 ACCENT = (255, 205, 70)
 GOOD = (120, 240, 160)
 BAD = (255, 120, 120)
+
+
+TEXT = (235, 235, 240)
+MUTED = (170, 170, 180)
 
 
 @dataclass
@@ -83,99 +89,6 @@ def load_state() -> dict:
         "buildings": buildings,
         "last_ts": last_ts,
     }
-
-
-def save_state(state: dict) -> None:
-    data = {
-        "coins": state["coins"],
-        "click_power": state["click_power"],
-        "buildings": state["buildings"],
-        "last_ts": time.time(),
-    }
-    tmp_path = SAVE_PATH + ".tmp"
-    with open(tmp_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    os.replace(tmp_path, SAVE_PATH)
-
-
-def reset_save() -> None:
-    if os.path.exists(SAVE_PATH):
-        os.remove(SAVE_PATH)
-
-
-def calc_cps(state: dict) -> float:
-    total = 0.0
-    for b in BUILDINGS:
-        qty = int(state["buildings"].get(b.key, 0))
-        total += qty * b.cps
-    return total
-
-
-def building_cost(b: BuildingDef, owned: int) -> float:
-    return b.base_cost * (b.cost_mult ** owned)
-
-
-def click_upgrade_cost(click_power: float) -> float:
-    level = max(0, int(round(click_power - 1)))
-    return 50 * (1.35 ** level)
-
-
-class UiButton:
-    def __init__(self, rect: pygame.Rect, text: str):
-        self.rect = rect
-        self.text = text
-        self.enabled = True
-        self.hover = False
-
-    def handle_event(self, event: pygame.event.Event) -> bool:
-        if not self.enabled:
-            return False
-        if event.type == pygame.MOUSEMOTION:
-            self.hover = self.rect.collidepoint(event.pos)
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            if self.rect.collidepoint(event.pos):
-                return True
-        return False
-
-    def draw(self, screen: pygame.Surface, font: pygame.font.Font):
-        base = (50, 50, 62)
-        if self.enabled and self.hover:
-            base = (70, 70, 88)
-        if not self.enabled:
-            base = (40, 40, 48)
-
-        pygame.draw.rect(screen, base, self.rect, border_radius=10)
-        pygame.draw.rect(screen, (90, 90, 110), self.rect, width=2, border_radius=10)
-        surf = font.render(self.text, True, TEXT if self.enabled else MUTED)
-        screen.blit(surf, surf.get_rect(center=self.rect.center))
-
-
-class CookieButton:
-    def __init__(self, center: tuple[int, int], radius: int):
-        self.center = center
-        self.radius = radius
-        self.hover = False
-
-    def contains(self, pos: tuple[int, int]) -> bool:
-        dx = pos[0] - self.center[0]
-        dy = pos[1] - self.center[1]
-        return (dx * dx + dy * dy) <= (self.radius * self.radius)
-
-    def handle_event(self, event: pygame.event.Event) -> bool:
-        if event.type == pygame.MOUSEMOTION:
-            self.hover = self.contains(event.pos)
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            if self.contains(event.pos):
-                return True
-        return False
-
-    def draw(self, screen: pygame.Surface):
-        r = self.radius + (6 if self.hover else 0)
-        pygame.draw.circle(screen, (70, 55, 35), self.center, r + 10)
-        pygame.draw.circle(screen, (210, 160, 95), self.center, r)
-        pygame.draw.circle(screen, (235, 195, 130), (self.center[0] - 14, self.center[1] - 10), r - 18)
-        for off in ((-50, -10), (-10, 35), (35, -25), (55, 25), (10, -55), (-40, 45)):
-            pygame.draw.circle(screen, (115, 80, 45), (self.center[0] + off[0], self.center[1] + off[1]), 8)
 
 
 def main() -> None:
