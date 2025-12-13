@@ -8,7 +8,7 @@ import time
 import pygame
 from Class.CookieButton import CookieButton
 from Class.UiButton import UiButton
-from calc import calc_cps, click_upgrade_cost, building_cost
+from calc import calc_cps, click_upgrade_cost, building_cost, BuildingDef, BUILDINGS
 from save import save_state, reset_save
 
 SAVE_PATH = os.path.join(os.path.dirname(__file__), "save.json")
@@ -27,24 +27,6 @@ BAD = (255, 120, 120)
 
 TEXT = (235, 235, 240)
 MUTED = (170, 170, 180)
-
-
-@dataclass
-class BuildingDef:
-    key: str
-    name: str
-    base_cost: float
-    cps: float
-    cost_mult: float = 1.15
-
-
-BUILDINGS = [
-    BuildingDef("cursor", "Curseur", base_cost=15, cps=0.1),
-    BuildingDef("grandma", "Mamie", base_cost=100, cps=1.0),
-    BuildingDef("farm", "Ferme", base_cost=1100, cps=8.0),
-    BuildingDef("factory", "Usine", base_cost=13000, cps=47.0),
-]
-
 
 def format_num(x: float) -> str:
     if x < 1000:
