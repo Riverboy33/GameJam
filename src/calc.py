@@ -10,7 +10,7 @@ class BuildingDef:
 
 
 BUILDINGS = [
-    BuildingDef("cursor", "Curseur", base_cost=15, cps=0.1),
+    BuildingDef("cursor", "Curor", base_cost=15, cps=0.1),
     BuildingDef("grandma", "Mamie", base_cost=100, cps=1.0),
     BuildingDef("farm", "Ferme", base_cost=1100, cps=8.0),
     BuildingDef("factory", "Usine", base_cost=13000, cps=47.0),
