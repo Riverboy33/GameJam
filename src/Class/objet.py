@@ -1,12 +1,13 @@
+import pygame.image
 from pygame import Vector3
 
-
 class Drawable:
-    def __init__(self, Position : Vector3, DrawMethode, DrawObject):
-        self.Position = Position
-        self.obj = DrawObject
-        self.draw_methode = DrawMethode
+    def __init__(self, Name,Parent ,Func):
+        self.draw = Func
+        self.Parent = Parent
+        self.Name = Name
 
     def Draw(self):
-        if callable(self.draw_methode):
-            self.draw_methode(self.obj)
+        if callable(self.draw):
+            print("Inside self.draw detected")
+            self.draw(self.Parent.window)
