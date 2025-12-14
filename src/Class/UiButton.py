@@ -31,15 +31,34 @@ class UiButton:
         return self.x <= pos[0] <= self.x + self.width and self.y <= pos[1] <= self.y + self.height
 
     def draw(self, surface):
-        color = (100, 100, 100) if not self.hovered else (150, 150, 150)
-        pygame.draw.rect(surface, color, (self.x, self.y, self.width, self.height), border_radius=5)
-        pygame.draw.rect(surface, (200, 200, 200), (self.x, self.y, self.width, self.height), 2, border_radius=5)
+        # If an icon is provided, use it as the button background (scaled to button size)
+        rect = (self.x, self.y, self.width, self.height)
 
         if self.icon:
-            icon_rect = self.icon.get_rect(center=(self.x + self.width // 2, self.y + self.height // 2))
-            surface.blit(self.icon, icon_rect)
+            try:
+                bg = pygame.transform.smoothscale(self.icon, (self.width, self.height))
+            except Exception:
+                bg = pygame.transform.scale(self.icon, (self.width, self.height))
+            surface.blit(bg, (self.x, self.y))
 
-        if self.text:
-            text_surf = self.font.render(self.text, True, (255, 255, 255))
-            text_rect = text_surf.get_rect(center=(self.x + self.width // 2, self.y + self.height // 2))
-            surface.blit(text_surf, text_rect)
+            # hover overlay
+            if self.hovered:
+                overlay = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+                overlay.fill((255, 255, 255, 40))
+                surface.blit(overlay, (self.x, self.y))
+
+            # draw border
+            pygame.draw.rect(surface, (200, 200, 200), rect, 2, border_radius=5)
+
+            # draw text centered on the image
+            if self.text:
+                text_surf = self.font.render(self.text, True, (255, 255, 255))
+                text_rect = text_surf.get_rect(center=(self.x + self.width // 2, self.y + self.height // 2))
+                surface.blit(text_surf, text_rect)
+        else:
+            # No icon provided: do not draw a rectangle fallback — buttons must be images.
+            # Optionally show text if present (not as a button background).
+            if self.text:
+                text_surf = self.font.render(self.text, True, (255, 255, 255))
+                text_rect = text_surf.get_rect(topleft=(self.x, self.y))
+                surface.blit(text_surf, text_rect)

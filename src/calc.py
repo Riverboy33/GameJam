@@ -9,19 +9,22 @@ class BuildingDef:
     cps: float
 
 BUILDINGS = [
-    BuildingDef("cursor", "Cursor", base_cost=15, cps=0.1),
-    BuildingDef("bouteille", "Bouteille", base_cost=100, cps=1.0),
-    BuildingDef("arrosoir", "Arrosoir", base_cost=1100, cps=8.0),
-    BuildingDef("serre", "Serre", base_cost=1500, cps=47.0),
+    # Replaced with simple case_* buildings per request
+    BuildingDef("case_arrosoir", "Arrosoir", base_cost=10, cps=2.0),
+    BuildingDef("case_engrais", "Engrais", base_cost=20, cps=3.0),
+    BuildingDef("case_serre", "Serre", base_cost=30, cps=4.0),
+    BuildingDef("case_abeille", "Abeilles", base_cost=40, cps=4.0),
 ]
 
-COST_MULTIPLIER = 1.15
-
 def building_cost(building_id: str, current_count: int) -> float:
+    """Return the cost for purchasing one more of `building_id`.
+
+    Costs are fixed per piece (no exponential multiplier) as requested.
+    """
     building = next((b for b in BUILDINGS if b.id == building_id), None)
     if not building:
         return 0
-    return building.base_cost * (COST_MULTIPLIER ** current_count)
+    return building.base_cost
 
 def calc_cps(state: Dict, upgrade_manager=None) -> float:
     buildings = state.get("buildings", {})

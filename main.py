@@ -13,9 +13,12 @@ from src.Class.ScoreDisplay import ScoreDisplay
 
 pygame.init()
 
+# Create the display first so surfaces can be converted safely by asset loader
+screen = pygame.display.set_mode((800, 800))
+
 ASSET_HANDLER = assethandler().init()
 
-GAME = main(pygame.display.set_mode((800, 800)), ASSET_HANDLER)
+GAME = main(screen, ASSET_HANDLER)
 
 GAME.add_drawable(BackgroundInterface(GAME))
 
