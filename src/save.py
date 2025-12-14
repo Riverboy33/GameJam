@@ -11,6 +11,9 @@ def save_state(state: dict) -> None:
         "buildings": state["buildings"],
         "last_ts": time.time(),
     }
+    if "upgrade_manager" in state:
+        data["upgrades"] = state["upgrade_manager"].to_dict()
+
     tmp_path = SAVE_PATH + ".tmp"
     with open(tmp_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)

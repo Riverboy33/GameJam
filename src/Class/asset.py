@@ -1,25 +1,25 @@
-import pygame.image
-
+import pygame
+import os
 
 class assethandler:
     def __init__(self):
-        self.tree_test = "./src/Asset/ClickButton/test_tree.png"
-
-    def get(self, name):
-        if self.__getattribute__(name):
-            return self.__getattribute__(name)
-        else:
-            print("Res : ", name, " failed to load .")
-            return None
+        self.assets = {}
 
     def init(self):
-        AH = assethandler()
-        for name, path in self.__dict__.items():
-            try:
-                loaded = pygame.image.load(path)
-                AH.__setattr__(name, loaded)
-                print("Successfully load ressource : ", path)
-            except pygame.error as e:
-                print("[ERROR]: (from asset.py)",e)
-                exit(84)
-        return AH
+        asset_dir = "./src/Asset/ClickButton"
+
+        if os.path.exists(asset_dir):
+            for filename in os.listdir(asset_dir):
+                if filename.endswith('.png'):
+                    asset_name = filename[:-4]
+                    path = os.path.join(asset_dir, filename)
+                    try:
+                        loaded = pygame.image.load(path)
+                        self.assets[asset_name] = loaded
+                    except Exception as e:
+                        print(f"Failed to load {path}: {e}")
+
+        return self
+
+    def get(self, name: str):
+        return self.assets.get(name, None)

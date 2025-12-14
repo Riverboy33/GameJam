@@ -7,5 +7,8 @@
     "farm": 10,
     "factory": 261
   },
+  "upgrades": {
+    "purchased": ["reinforced_cursor", "golden_touch"]
+  },
   "last_ts": 1765622447.482237
 }

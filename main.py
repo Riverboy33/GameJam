@@ -1,31 +1,30 @@
-#Game handler
-import pygame.display
-from pygame import Vector2
+import pygame
+import sys
 
-from Class.text import game_text
-from src.Class.ClickButton import ClickButton
+from src.utils.Vector2 import Vector2
+from src.Class.asset import assethandler
+
+from src.Class.BackgroundInterface import BackgroundInterface
+from src.Class.FondBackground import FondBackground
 from src.Class.main import main
-from src.Class.asset import assethandler, fonthandler
-from src.Class.text import game_text, format_num
+from src.Class.TreeDisplay import TreeDisplay
+from src.Class.BuildingMenu import BuildingMenu
+from src.Class.ScoreDisplay import ScoreDisplay
 
 pygame.init()
-pygame.font.init()
 
-Window = pygame.display.set_mode((800, 800))
-pygame.display.set_caption("Tree clicker")
 ASSET_HANDLER = assethandler().init()
-FONT_HANDLER = fonthandler()
-GAME = main(ASSET_HANDLER, FONT_HANDLER)
 
-GAME.add_event(GAME.quit)
-GAME.add_drawable(ClickButton(GAME, Vector2(x=400, y=400)))
-GAME.add_text(game_text("money",GAME, Vector2(x=100, y=0),"money: " +  format_num(GAME.money)))
+GAME = main(pygame.display.set_mode((800, 800)), ASSET_HANDLER)
 
-while GAME.isRunning:
-    dt = GAME.clock.tick(GAME.FPS) / 1000.0
+GAME.add_drawable(BackgroundInterface(GAME))
 
-    events = pygame.event.get()
-    GAME.handle_event(events)
-    GAME.rendering()
+GAME.add_drawable(FondBackground(GAME, Vector2(x=250, y=400)))
 
-pygame.quit()
+GAME.add_drawable(TreeDisplay(GAME, Vector2(x=200, y=400), max_size=600))
+
+GAME.add_drawable(BuildingMenu(GAME))
+
+GAME.add_drawable(ScoreDisplay(GAME))
+
+GAME.run()

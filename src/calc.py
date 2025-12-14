@@ -1,33 +1,38 @@
 from dataclasses import dataclass
+from typing import Dict, Optional
 
 @dataclass
 class BuildingDef:
-    key: str
+    id: str
     name: str
     base_cost: float
     cps: float
-    cost_mult: float = 1.15
-
 
 BUILDINGS = [
-    BuildingDef("cursor", "Curor", base_cost=15, cps=0.1),
-    BuildingDef("grandma", "Mamie", base_cost=100, cps=1.0),
-    BuildingDef("farm", "Ferme", base_cost=1100, cps=8.0),
-    BuildingDef("factory", "Usine", base_cost=13000, cps=47.0),
+    BuildingDef("cursor", "Cursor", base_cost=15, cps=0.1),
+    BuildingDef("bouteille", "Bouteille", base_cost=100, cps=1.0),
+    BuildingDef("arrosoir", "Arrosoir", base_cost=1100, cps=8.0),
+    BuildingDef("serre", "Serre", base_cost=1500, cps=47.0),
 ]
 
-def calc_cps(state: dict) -> float:
-    total = 0.0
-    for b in BUILDINGS:
-        qty = int(state["buildings"].get(b.key, 0))
-        total += qty * b.cps
-    return total
+COST_MULTIPLIER = 1.15
 
+def building_cost(building_id: str, current_count: int) -> float:
+    building = next((b for b in BUILDINGS if b.id == building_id), None)
+    if not building:
+        return 0
+    return building.base_cost * (COST_MULTIPLIER ** current_count)
 
-def building_cost(b: BuildingDef, owned: int) -> float:
-    return b.base_cost * (b.cost_mult ** owned)
+def calc_cps(state: Dict, upgrade_manager=None) -> float:
+    buildings = state.get("buildings", {})
+    total_cps = 0.0
 
+    for building_def in BUILDINGS:
+        count = buildings.get(building_def.id, 0)
+        total_cps += building_def.cps * count
 
-def click_upgrade_cost(click_power: float) -> float:
-    level = max(0, int(round(click_power - 1)))
-    return 50 * (1.35 ** level)
+    if upgrade_manager:
+        effects = upgrade_manager.apply_upgrades(state)
+        total_cps *= effects.get("cps_multiplier", 1.0)
+
+    return total_cps

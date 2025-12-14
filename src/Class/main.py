@@ -1,61 +1,78 @@
 import pygame
-
-from src.Class.objet import Drawable
-
+import time
+from typing import TYPE_CHECKING
+from src.Class.Drawable import Drawable
 
 class main:
-    def __init__(self, assethandler):
-        """"SERVICE"""
+    def __init__(self, window, assethandler):
+        self.window = window
         self.assethandler = assethandler
-        self.window = pygame.display.set_mode((800, 800))
-        self.clock = pygame.time.Clock()
+        self.drawables = []
         self.events = []
-        self.drawable = []
-
-        """Value"""
-        self.money = 0
-        self.FPS = 60
-        self.isRunning = True
-        self.clickButton = None
-        self.upgradeMenu = None
-        self.dt = 0
+        self.running = True
+        self.money = 0.0
+        self.click_power = 1.0
+        self.buildings = {}
+        self.upgrade_manager = None
+        self.currency_name = "Cookies"
+        self.last_update = 0
+        self.auto_click_timer = 0
+        self.auto_click_interval = 0.1
 
     def add_event(self, eventFunc):
-        if callable(eventFunc):
-            self.events.append(eventFunc)
-        else:
-            print("Cannot add event : ", eventFunc)
+        self.events.append(eventFunc)
 
-    def handle_event(self, events):
-        for eventConnected in self.events:
-            eventConnected(events)
+    def add_drawable(self, drawable: Drawable):
+        self.drawables.append(drawable)
 
-    def rendering(self):
-        self.window.fill((0, 0, 0))
-        for drawable  in self.drawable:
-            drawable.Draw()
-            print(drawable.Name)
-        pygame.display.flip()
-
-    def add_drawable(self, obj):
-        if isinstance(obj, Drawable):
-            self.drawable.append(obj)
-
-    def quit(self, events):
-        for event in events:
-            if event.type == pygame.QUIT:
-                self.isRunning = False
-
-    def get_element_by_name(self, name : str) -> Drawable | None:
-        for element in self.drawable:
-            if element.name == name:
-                return element
+    def get_element_by_name(self, name: str):
+        for drawable in self.drawables:
+            if hasattr(drawable, 'name') and drawable.name == name:
+                return drawable
         return None
 
-    def get_element_by_id(self, id : None) -> Drawable | None:
-        for i in range(len(self.drawable)):
-            if i == id:
-                return self.drawable[i]
-        return None
+    def run(self):
+        clock = pygame.time.Clock()
+        self.last_update = time.time()
 
+        while self.running:
+            current_time = time.time()
+            dt = current_time - self.last_update
+            self.last_update = current_time
 
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    pygame.quit()
+                    return
+
+                for event_func in self.events:
+                    event_func(event)
+
+            self.update_passive_income(dt)
+
+            self.window.fill((0, 0, 0))
+
+            for drawable in self.drawables:
+                drawable.draw(self.window)
+
+            pygame.display.flip()
+            clock.tick(60)
+
+    def update_passive_income(self, dt):
+        from src.calc import calc_cps
+        cps = calc_cps({"buildings": self.buildings}, self.upgrade_manager)
+        self.money += cps * dt
+
+        cursor_count = self.buildings.get("cursor", 0)
+        if cursor_count > 0:
+            self.auto_click_timer += dt
+            if self.auto_click_timer >= self.auto_click_interval:
+                clicks = int(self.auto_click_timer / self.auto_click_interval)
+                self.auto_click_timer -= clicks * self.auto_click_interval
+
+                click_value = self.click_power * cursor_count * clicks
+                if self.upgrade_manager:
+                    effects = self.upgrade_manager.apply_upgrades({"buildings": self.buildings})
+                    click_value *= effects.get("click_multiplier", 1.0)
+                self.money += click_value
