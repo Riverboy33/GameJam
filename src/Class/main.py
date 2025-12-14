@@ -14,7 +14,7 @@ class main:
         self.click_power = 1.0
         self.buildings = {}
         self.upgrade_manager = None
-        self.currency_name = "Cookies"
+        self.currency_name = "Argent"
         self.last_update = 0
         self.auto_click_timer = 0
         self.auto_click_interval = 0.1
