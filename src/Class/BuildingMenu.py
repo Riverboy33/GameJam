@@ -50,7 +50,7 @@ class BuildingMenu(Drawable):
             self.Parent.buildings[building_id] = current_count + 1
 
     def _draw_menu(self, surface):
-        title_surf = self.title_font.render("Buildings", True, (255, 255, 255))
+        title_surf = self.title_font.render("Outils", True, (255, 255, 255))
         surface.blit(title_surf, (620, 150))
 
         for button in self.buttons:
