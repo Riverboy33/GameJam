@@ -9,10 +9,10 @@ class BuildingDef:
     cps: float
 
 BUILDINGS = [
-    BuildingDef("cursor", "Cursor", base_cost=15, cps=0.1),
-    BuildingDef("bouteille", "Bouteille", base_cost=100, cps=1.0),
-    BuildingDef("arrosoir", "Arrosoir", base_cost=1100, cps=8.0),
-    BuildingDef("serre", "Serre", base_cost=1500, cps=47.0),
+    BuildingDef("cursor", "Cursor", base_cost=15, cps=1.0),
+    BuildingDef("bouteille", "Bouteille", base_cost=50, cps=10.0),
+    BuildingDef("arrosoir", "Arrosoir", base_cost=200, cps=20.0),
+    BuildingDef("serre", "Serre", base_cost=750, cps=40.0),
 ]
 
 COST_MULTIPLIER = 1.15
