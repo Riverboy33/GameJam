@@ -85,7 +85,7 @@ class BuildingMenu(Drawable):
         win_w = surface.get_width()
         panel_x = win_w - self.margin_right
         title_x = panel_x - 160
-        title_surf = self.title_font.render("Buildings", True, (255, 255, 255))
+        title_surf = self.title_font.render("Outils", True, (255, 255, 255))
         surface.blit(title_surf, (title_x, 110))
 
         for button in self.buttons:
