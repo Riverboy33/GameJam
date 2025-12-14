@@ -52,7 +52,7 @@ class UiButton:
 
             # draw text centered on the image
             if self.text:
-                text_surf = self.font.render(self.text, True, (255, 255, 255))
+                text_surf = self.font.render("", True, (255, 255, 255))
                 text_rect = text_surf.get_rect(center=(self.x + self.width // 2, self.y + self.height // 2))
                 surface.blit(text_surf, text_rect)
         else:
